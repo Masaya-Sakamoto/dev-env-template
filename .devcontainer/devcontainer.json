@@ -1,0 +1,20 @@
+{
+	"name": "Dev Environment",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"--env_file",
+		"${localWorkspaceFolder}/project.env"
+	],
+	"workspaceFolder": "/workspace/app",
+	"postCreateCommand": "bash .devcontainer/../scripts/post-create.sh",
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": []
+		}
+	}
+}
