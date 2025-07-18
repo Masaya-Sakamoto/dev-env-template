@@ -5,7 +5,9 @@
 	},
 	"runArgs": [
 		"--env_file",
-		"${localWorkspaceFolder}/project.env"
+		"${localWorkspaceFolder}/project.env",
+		"--build-arg='base_image=mcr.microsoft.com/devcontainers/base:ubuntu-24.04'",
+		"--build-arg='os_code_name=noble'"
 	],
 	"workspaceFolder": "/workspace/app",
 	"postCreateCommand": "bash .devcontainer/../scripts/post-create.sh",
