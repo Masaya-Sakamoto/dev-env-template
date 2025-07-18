@@ -1,22 +1,20 @@
 {
-	"name": "Dev Environment",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	"runArgs": [
-		"--env_file",
-		"${localWorkspaceFolder}/project.env",
-		"--build-arg='base_image=mcr.microsoft.com/devcontainers/base:ubuntu-24.04'",
-		"--build-arg='os_code_name=noble'"
-	],
-	"workspaceFolder": "/workspace/app",
-	"postCreateCommand": "bash .devcontainer/../scripts/post-create.sh",
-	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-	],
-	"customizations": {
-		"vscode": {
-			"extensions": []
-		}
-	}
+  "name": "My Standard Dev Environment",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "args": {
+      "BASE_IMAGE": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+      "OS_CODE_NAME": "noble"
+    }
+  },
+  "runArgs": [
+    "--env-file",
+    "${localWorkspaceFolder}/project.env"
+  ],
+  "workspaceFolder": "/workspace/app",
+  "postCreateCommand": "mkdir -p /workspace/app && bash /tmp/scripts/post-create.sh",
+
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ]
 }
