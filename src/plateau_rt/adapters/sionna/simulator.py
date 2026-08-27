@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
-#import tensorflow as tf  
-from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray, Scene
+import numpy as np
+
+# tfの代わりにSionna 1.0のRadioMapSolverをインポート
+from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray, Scene, RadioMapSolver
 
 class SionnaSimulator:
     def __init__(self, xml_path: Path, manifest_path: Path):
@@ -13,32 +15,35 @@ class SionnaSimulator:
     def run_coverage_simulation(self, output_dir: Path) -> Path:
         print("--- Starting Sionna-RT Simulation ---")
         
-        # 1. シーンのロード (この時点でXML内の mat-itu_... が検知され、自動でRadioMaterialが適用される！)
+        # 1. シーンのロード
         print(f"Loading scene from {self.xml_path}...")
         self.scene = load_scene(str(self.xml_path))
         assert self.scene is not None, "Failed to load Sionna scene."
 
-        # 2. マニフェストの読み込み (現在は座標やメタデータの確認用)
+        # 2. マニフェストの読み込み
         with open(self.manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
         
         # 3. アンテナと送受信機 (Tx/Rx) のセットアップ
         self._setup_transceivers(manifest.get("center_lat_lon", [0, 0]))
 
-        # 4. カバレッジマップの計算
+        # 4. カバレッジマップの計算 (Sionna 1.0以降のRadioMapSolverを使用)
         print("Computing coverage map...")
-        cm = self.scene.coverage_map( 
-            cm_center=[0, 0, 1.5],
-            cm_orientation=[0, 0, 0],
-            cm_size=[200, 200],
-            cm_res=[1, 1],
-            max_depth=3
-        )
+        rm_solver = RadioMapSolver()
+        rm = rm_solver(
+            self.scene,
+            max_depth=3,
+            cell_size=[1.0, 1.0],
+            center=[0.0, 0.0, 1.5],
+            size=[200.0, 200.0],
+            orientation=[0.0, 0.0, 0.0]
+        ) # type: ignore
 
         # 5. 計算結果の保存
         cm_output_path = output_dir / f"{self.xml_path.stem}_coverage.npy"
-        import numpy as np
-        np.save(cm_output_path, cm.as_tensor().numpy())
+        
+        # Sionna 1.0ではDr.Jitテンソルが返るため、np.array() でNumpy配列にキャストして保存
+        np.save(cm_output_path, np.array(rm.path_gain))
         print(f"Coverage map saved to {cm_output_path}")
 
         return cm_output_path
@@ -55,7 +60,7 @@ class SionnaSimulator:
             pattern="dipole", polarization="V"
         )
 
-        tx = Transmitter(name="tx_base_station", position=[-50, -50, 30.0])
+        tx = Transmitter(name="tx_base_station", position=[-50, -50, 30.0])  # type: ignore
         self.scene.add(tx)
         
         self.scene.frequency = 3.5e9
