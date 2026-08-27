@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 # tensorflowはインストールされていても、型チェッカーがstubを見つけられないことがあるため無視します
-import tensorflow as tf  # type: ignore
+import tensorflow as tf  
 
 from sionna.rt import load_scene, RadioMaterial, Transmitter, Receiver, PlanarArray, Scene
 
@@ -41,10 +41,10 @@ class SionnaSimulator:
         print("Computing coverage map...")
         # 修正: compute_coverage_map -> coverage_map (引数の型警告も無視してPythonのリストを渡す)
         cm = self.scene.coverage_map(
-            cm_center=[0, 0, 1.5],   # type: ignore
-            cm_orientation=[0, 0, 0], # type: ignore
-            cm_size=[200, 200],       # type: ignore
-            cm_res=[1, 1],            # type: ignore
+            cm_center=[0, 0, 1.5],
+            cm_orientation=[0, 0, 0],
+            cm_size=[200, 200],
+            cm_res=[1, 1],
             max_depth=3
         )
 
@@ -53,7 +53,7 @@ class SionnaSimulator:
         
         import numpy as np
         # as_tensor().numpy() でTensorFlowからNumPy配列に変換
-        np.save(cm_output_path, cm.as_tensor().numpy()) # type: ignore
+        np.save(cm_output_path, cm.as_tensor().numpy())
         print(f"Coverage map saved to {cm_output_path}")
 
         return cm_output_path
@@ -74,7 +74,7 @@ class SionnaSimulator:
                 loaded_materials[itu_name] = RadioMaterial(itu_name)
 
             # 修正: scene.get() の戻り値の型定義が曖昧なため、型チェッカーを無視して上書き
-            obj.radio_material = loaded_materials[itu_name]  # type: ignore
+            obj.radio_material = loaded_materials[itu_name]
         
         print(f"Assigned materials to {len(material_mapping)} objects.")
 
@@ -93,7 +93,7 @@ class SionnaSimulator:
         )
 
         # 修正: 実体はリストを受け付けるが、型stubがmitsuba.Point3fを要求するため無視
-        tx = Transmitter(name="tx_base_station", position=[-50, -50, 30.0])  # type: ignore
+        tx = Transmitter(name="tx_base_station", position=[-50, -50, 30.0])
         self.scene.add(tx)
         
         self.scene.frequency = 3.5e9
