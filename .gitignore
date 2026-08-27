@@ -1,1 +1,26 @@
+# 環境変数ファイル（実体は無視し、.exampleのみ追跡）
 *.env
+.env
+!*.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.whl
+dist/
+build/
+.venv/
+uv.lock
+
+# VS Code / IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+
+# OS / Temporary
+.DS_Store
+Thumbs.db

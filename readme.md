@@ -40,19 +40,46 @@
 
 ### Step 2: 新しく作成したリポジトリをクローンする
 
-次に、作成したリポジトリをローカルマシンにクローンします。
+サブモジュール（Sionna-RT）を含めてローカルマシンにクローンします。
 
 ```bash
 # "your-account"と"your-new-repository"をあなたのものに置き換えてください
-git clone git@github.com:your-account/your-new-repository.git
+git clone --recursive git@github.com:your-account/your-new-repository.git
 
 # クローンしたディレクトリに移動
 cd your-new-repository
 ```
 
-### Step 3: プロジェクト設定ファイルを編集する
+> **Note**
+> すでに通常クローンしている場合は、以下のコマンドでサブモジュールを初期化してください。
+> ```bash
+> git submodule update --init --recursive
+> ```
 
-`project.env`ファイルを開き、開発したいアプリケーションの情報を設定します。このファイルで、コンテナに渡す環境変数を定義します。
+### Step 3: 環境設定ファイル（.env）を作成・編集する
+
+`.env.example` をコピーして `.env` を作成し、マシンのGPU環境に合わせて設定します。
+
+```bash
+cp .env.example .env
+```
+
+**`.env`**
+```bash
+# お使いのGPUのCompute Capability (例: 1660Ti=75, RTX 3080/3090=86, RTX 4090=89, A100=80)
+CUDA_ARCH=75
+
+# 利用するベースCUDAイメージ
+CUDA_IMAGE=nvidia/cuda:12.1.1-devel-ubuntu22.04
+```
+
+### Step 4: プロジェクト設定ファイル（project.env）を作成・編集する
+
+`project.env.example` をコピーして `project.env` を作成し、開発対象のアプリケーション情報を設定します。
+
+```bash
+cp project.env.example project.env
+```
 
 **`project.env`**
 
@@ -65,22 +92,26 @@ GIT_USER_NAME="Your Name"
 GIT_USER_EMAIL="your_email@example.com"
 ```
 
-### Step 4: SSHキーの準備
+### Step 5: SSHキーの準備
 
 コンテナ内から`git clone`を行うために、SSHキーが必要です。
 
 1.  ホストマシン（あなたのPC）にSSHキーペア（`~/.ssh/id_ed25519`など）が設定されていることを確認してください。
 2.  そのキーペアの**公開鍵** (`~/.ssh/id_ed25519.pub`) を、GitHubやその他のGitホスティングサービスに登録しておいてください。
 
-### Step 5: ベース・ビルダーイメージを事前にビルドする
+### Step 6: ベース・ビルダーイメージを事前にビルドする
 
-Devcontainerが参照するローカルイメージを事前にビルドします。
+Devcontainerが参照するベースイメージおよびSionna-RTのコンパイル済みビルダーイメージをビルドします。
 
 ```bash
-docker compose build base builder
+# 1. 共通ベースイメージのビルド
+docker compose build base
+
+# 2. Sionna-RTのコンパイルとWheel生成ビルダーのビルド
+docker compose build builder
 ```
 
-### Step 6: 開発環境を起動する
+### Step 7: 開発環境を起動する
 
 いよいよ開発環境を起動します。
 
