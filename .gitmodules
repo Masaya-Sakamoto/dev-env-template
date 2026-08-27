@@ -1,0 +1,3 @@
+[submodule "third_party/sionna-rt"]
+	path = third_party/sionna-rt
+	url = https://github.com/NVlabs/sionna-rt.git
