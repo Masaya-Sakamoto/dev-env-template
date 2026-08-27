@@ -1,4 +1,7 @@
 ARG BASE_IMAGE
+ARG BUILDER_IMAGE
+FROM ${BUILDER_IMAGE} AS builder
+
 FROM ${BASE_IMAGE}
 
 # UID/GIDの管理 (ホストマシンのパーミッション問題回避)

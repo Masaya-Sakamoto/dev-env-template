@@ -1,8 +1,18 @@
 {
   "name": "PLATEAU Sionna-RT Dev",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "BASE_IMAGE": "plateau-sionna-base:${localEnv:CUDA_ARCH:75}",
+      "BUILDER_IMAGE": "plateau-sionna-builder:${localEnv:CUDA_ARCH:75}"
+    }
+  },
   "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "runArgs": [
+    "--gpus",
+    "all"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [

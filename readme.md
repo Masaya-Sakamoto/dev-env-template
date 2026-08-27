@@ -72,7 +72,15 @@ GIT_USER_EMAIL="your_email@example.com"
 1.  ホストマシン（あなたのPC）にSSHキーペア（`~/.ssh/id_ed25519`など）が設定されていることを確認してください。
 2.  そのキーペアの**公開鍵** (`~/.ssh/id_ed25519.pub`) を、GitHubやその他のGitホスティングサービスに登録しておいてください。
 
-### Step 5: 開発環境を起動する
+### Step 5: ベース・ビルダーイメージを事前にビルドする
+
+Devcontainerが参照するローカルイメージを事前にビルドします。
+
+```bash
+docker compose build base builder
+```
+
+### Step 6: 開発環境を起動する
 
 いよいよ開発環境を起動します。
 

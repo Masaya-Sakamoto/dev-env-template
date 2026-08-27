@@ -33,25 +33,3 @@ services:
       # builderイメージから直接アーティファクトを吸い上げる (Compose V2機能)
       additional_contexts:
         - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
-
-  # 4. 開発用イメージ (Devcontainer用)
-  dev:
-    image: plateau-sionna-dev:${CUDA_ARCH}
-    depends_on:
-      - builder
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-      args:
-        BASE_IMAGE: plateau-sionna-base:${CUDA_ARCH}
-      additional_contexts:
-        - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
-    volumes:
-      - .:/workspace
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
