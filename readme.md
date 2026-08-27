@@ -126,6 +126,22 @@ docker compose build builder
 
 -----
 
+## 🧪 インフラの統合テスト (CI / 検証)
+
+本テンプレートでビルドされる `runtime` イメージが、Sionna-RT を正しくインストールし実行可能であるかを検証するためのテストスクリプトが用意されています。
+
+```bash
+# base -> builder -> runtime をビルドし、Sionna-RTのユニットテストを実行
+./scripts/run-infra-test.sh
+```
+
+このテストは以下を検証します:
+1. `Dockerfile.base`, `Dockerfile.builder`, `Dockerfile.runtime` のビルドが成功すること
+2. Sionna-RT のコンパイル済み Wheel が `runtime` イメージに正しくインストールされること
+3. Sionna-RT の数値計算・コアロジックのユニットテスト（30件以上）が正常にパスすること
+
+-----
+
 ## 🔧 環境のカスタマイズ
 
 この環境をさらにカスタマイズしたい場合は、以下のファイルを編集してください。

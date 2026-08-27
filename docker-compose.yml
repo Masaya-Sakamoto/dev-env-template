@@ -22,7 +22,7 @@ services:
 
   # 3. 実行用イメージ (本番用)
   runtime:
-    image: my-registry.example.com/plateau-sionna-runtime:latest
+    image: plateau-sionna-runtime:${CUDA_ARCH}
     depends_on:
       - builder
     build:
@@ -33,3 +33,24 @@ services:
       # builderイメージから直接アーティファクトを吸い上げる (Compose V2機能)
       additional_contexts:
         - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
+
+  # 4. インフラ検証用テストランナー (runtimeイメージを直接利用)
+  test:
+    image: plateau-sionna-runtime:${CUDA_ARCH}
+    depends_on:
+      - builder
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.runtime
+      args:
+        BASE_IMAGE: plateau-sionna-base:${CUDA_ARCH}
+      additional_contexts:
+        - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
+    profiles:
+      - test
+    volumes:
+      - ./third_party/sionna-rt/test:/test-data:ro
+    command: >
+      bash -c "uv pip install --system 'pytest>=8.0.0' && 
+      cd /test-data && 
+      python -m pytest -o cache_dir=/tmp/.pytest_cache --cpu -v unit/test_utils.py unit/test_hashing.py"

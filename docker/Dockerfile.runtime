@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 WORKDIR /app
 
 # プロジェクトの依存関係ファイルをコピー
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock* ./
 
 # ビルダーコンテナからコンパイル済みのSionna-RT Wheelをコピー (additional_contexts経由)
 COPY --from=builder /wheels /wheels
