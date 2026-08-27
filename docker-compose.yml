@@ -1,0 +1,57 @@
+services:
+  # 1. 共通ベースイメージ (依存関係なし、独立ビルド可能)
+  base:
+    image: plateau-sionna-base:${CUDA_ARCH}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.base
+      args:
+        CUDA_IMAGE: ${CUDA_IMAGE:-nvidia/cuda:12.1.1-devel-ubuntu22.04}
+
+  # 2. C++ バイナリビルダー (Sionna-RTのコンパイル)
+  builder:
+    image: plateau-sionna-builder:${CUDA_ARCH}
+    depends_on:
+      - base
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.builder
+      args:
+        BASE_IMAGE: plateau-sionna-base:${CUDA_ARCH}
+        CUDA_ARCH: ${CUDA_ARCH}
+
+  # 3. 実行用イメージ (本番用)
+  runtime:
+    image: my-registry.example.com/plateau-sionna-runtime:latest
+    depends_on:
+      - builder
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.runtime
+      args:
+        BASE_IMAGE: plateau-sionna-base:${CUDA_ARCH}
+      # builderイメージから直接アーティファクトを吸い上げる (Compose V2機能)
+      additional_contexts:
+        - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
+
+  # 4. 開発用イメージ (Devcontainer用)
+  dev:
+    image: plateau-sionna-dev:${CUDA_ARCH}
+    depends_on:
+      - builder
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        BASE_IMAGE: plateau-sionna-base:${CUDA_ARCH}
+      additional_contexts:
+        - builder=docker-image://plateau-sionna-builder:${CUDA_ARCH}
+    volumes:
+      - .:/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

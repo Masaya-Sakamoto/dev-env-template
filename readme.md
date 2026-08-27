@@ -95,3 +95,9 @@ GIT_USER_EMAIL="your_email@example.com"
   * **VS Codeの拡張機能や設定の変更**: `.devcontainer/devcontainer.json`を編集し、推奨する拡張機能を追加したり、コンテナのメモリ割り当てを変更したりできます。
 
 ファイルを編集した後は、コマンドパレットから「**Dev Containers: Rebuild Container**」を実行して変更を適用してください。
+
+-----
+
+## oc_ha ブランチ
+
+OpenCodeとHermes Agentが有効化された開発環境のテンプレートです。

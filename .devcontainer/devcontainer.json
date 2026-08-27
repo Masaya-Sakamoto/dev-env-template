@@ -1,20 +1,26 @@
 {
-  "name": "My Standard Dev Environment",
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "args": {
-      "BASE_IMAGE": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
-      "OS_CODE_NAME": "noble"
+  "name": "PLATEAU Sionna-RT Dev",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "python.formatting.provider": "none",
+        "editor.formatOnSave": true,
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        }
+      }
     }
   },
-  "runArgs": [
-    "--env-file",
-    "${localWorkspaceFolder}/project.env"
-  ],
-  "workspaceFolder": "/workspace/app",
-  "postCreateCommand": "mkdir -p /workspace/app && bash /tmp/scripts/post-create.sh",
-
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-  ]
+  "remoteUser": "vscode",
+  "postCreateCommand": "sudo chown vscode:vscode /workspace/uv.lock || true && uv sync --dev && uv pip install /wheels/*.whl"
 }
